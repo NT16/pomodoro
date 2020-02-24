@@ -1,24 +1,31 @@
 import React from 'react';
-import logo from './logo.svg';
+import { BrowserRouter as Router, Route } from 'react-router-dom'
+import 'bootstrap/dist/css/bootstrap.css';
+// Put any other imports below so that CSS from your
+// components takes precedence over default styles.
 import './App.css';
+import Ticker from './components/Ticker'
+import NavbarWithRouter from './components/Navbar'
+import Settings from './components/Settings';
+import About from './components/About';
 
-function App() {
+const App = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className='container-fluid'>
+      <div className='header'>
+        <h1>Pomodoro</h1>
+      </div>
+      <Router className='container'>
+        <div>
+          <NavbarWithRouter />
+          <Route
+            path='/home'
+            render={(routeProps) => <Ticker {...routeProps} />}
+          />
+          <Route path='/settings' render={(routeProps) => <Settings {...routeProps} />} />
+          <Route path='/about' render={() => <About />} />
+        </div>
+      </Router>
     </div>
   );
 }
