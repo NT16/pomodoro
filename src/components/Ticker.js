@@ -57,6 +57,9 @@ const Ticker = (props) => {
             setDone('true')
             if (index !== (cycle.length - 1)) {
                 setIndex(index + 1)
+            }else {
+               setClicked(false) 
+               setIndex(0)
             }
             console.log('index is', index)
         }, limit * 60000)
@@ -65,6 +68,7 @@ const Ticker = (props) => {
     //5
     useEffect(() => {
         if (startClicked) {
+            setLog([])
             console.log('in useEffect 1, start clicked')
             startTimer(cycle[index])
         }
@@ -88,12 +92,17 @@ const Ticker = (props) => {
         <div className='row'>
             <div className='col-md-8'>
                 <div className='text-center'>
-                    <Button
+                    {
+                        !startClicked || done ?
+                        <Button
                         onClick={onStartClick}
                         variant="primary"
-                    >
+                        >
                         Start
-                    </Button>
+                        </Button>
+                        : null
+                    }
+                    
                     <div className='ticker'>
                         {
                             display()
