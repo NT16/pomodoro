@@ -1,23 +1,25 @@
 import React from 'react';
 import { useFormField } from '../hooks/index'
 import Button from 'react-bootstrap/Button'
+import { useHistory } from 'react-router-dom'
 
-const Settings = (props) => {
+const Settings = () => {
+    let history = useHistory()
+
     const work = useFormField('number', 'work')
     const shortBreak = useFormField('number', 'shortBreak')
     const break2 = useFormField('number', 'break2')
 
     const onFormSubmit = (event) => {
         event.preventDefault()
-        console.log('props.history', props.history)
-        props.history.push({
+        history.push({
             pathname: '/home',
             data: {
                 work: parseInt(event.target.work.value),
                 shortBreak: parseInt(event.target.shortBreak.value),
                 break2: parseInt(event.target.break2.value)
-              }
-          })
+            }
+        })
     }
 
     return (
@@ -42,7 +44,7 @@ const Settings = (props) => {
                     variant='primary'
                     className='full-width'
                 >Go
-          </Button>
+                </Button>
             </form>
         </div>
     )

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import Button from 'react-bootstrap/Button'
 import Timer from './Timer';
+import { useLocation } from 'react-router-dom'
 
-const Ticker = (props) => {
+const Ticker = () => {
     const [cycle, setCycle] = useState([2, 1, 2]) //[25,5,25,5,25,5,25,20] //[2,1,2,1,2,1,2,2]
     const [done, setDone] = useState(false)
     const [startClicked, setClicked] = useState(false)
@@ -12,7 +13,8 @@ const Ticker = (props) => {
     const [break2, setBreak2] = useState(15); //15
     const [index, setIndex] = useState(0)
 
-
+    let location = useLocation();
+   
     function checkInputValidity( value, func ) {
         if( !isNaN(value) ){
             func(parseInt(value))
@@ -20,14 +22,15 @@ const Ticker = (props) => {
     }
 
     useEffect(() => {
-        if (props.location.data) {
-            console.log('inside ticker, props.location.data', props.location.data)
+        if(location.data){
+            console.log('inside ticker, location.data', location.data)
 
-            checkInputValidity(props.location.data.work, setWork)
-            checkInputValidity(props.location.data.shortBreak, setShortBreak)
-            checkInputValidity(props.location.data.break2, setBreak2)   
+            checkInputValidity(location.data.work, setWork)
+            checkInputValidity(location.data.shortBreak, setShortBreak)
+            checkInputValidity(location.data.break2, setBreak2)   
         }
-    }, [props.location.data])
+    }
+    , [location.data])
 
     //1
     const setTimeline = () => {
@@ -51,24 +54,20 @@ const Ticker = (props) => {
         console.log('Timer starts')
         console.log('inside startTimer, set is', cycle.toString(), 'set length', cycle.length)
         setDone(false)
+        console.log('limit',limit, 'index', index)
         setTimeout(() => {
             console.log(`${index + 1}. ${limit} min timer done`)
             setLog([...logs, `${index + 1}. ${limit} min timer done`])
             setDone('true')
             if (index !== (cycle.length - 1)) {
                 setIndex(index + 1)
-            }else {
-               setClicked(false) 
-               setIndex(0)
             }
-            console.log('index is', index)
         }, limit * 60000)
     }
 
     //5
     useEffect(() => {
         if (startClicked) {
-            setLog([])
             console.log('in useEffect 1, start clicked')
             startTimer(cycle[index])
         }
@@ -89,11 +88,11 @@ const Ticker = (props) => {
     }
 
     return (
-        <div className='row'>
+        <div className='row' id='ticker'>
             <div className='col-md-8'>
                 <div className='text-center'>
                     {
-                        !startClicked || done ?
+                        !startClicked ?
                         <Button
                         onClick={onStartClick}
                         variant="primary"

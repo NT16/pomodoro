@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Route, Switch, NavLink, Redirect } from 'react-router-dom'
 import 'bootstrap/dist/css/bootstrap.css';
 // Put any other imports below so that CSS from your
 // components takes precedence over default styles.
@@ -15,16 +15,18 @@ const App = () => {
       <div className='header'>
         <h1>Pomodoro</h1>
       </div>
+
       <Router className='container'>
-        <div>
-          <NavbarWithRouter />
+        <NavbarWithRouter />
+        <Switch>
           <Route
             path='/home'
-            render={(routeProps) => <Ticker {...routeProps} />}
+            render={() => <Ticker />}
           />
-          <Route path='/settings' render={(routeProps) => <Settings {...routeProps} />} />
+          <Route path='/settings' render={() => <Settings />} />
           <Route path='/about' render={() => <About />} />
-        </div>
+          <Route path='/' render={ () => <Redirect to='/home' />} />
+        </Switch>
       </Router>
     </div>
   );

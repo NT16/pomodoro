@@ -11,7 +11,7 @@ const Timer = ({ limit }) => {
                 setTime(time + 1)
             }
         }, 60000)
-    }, [time, limit])
+    }, [time])
 
     return (
         <>
