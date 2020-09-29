@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Switch, NavLink, Redirect } from 'react-router-dom'
+import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom'
 import 'bootstrap/dist/css/bootstrap.css';
 // Put any other imports below so that CSS from your
 // components takes precedence over default styles.
@@ -11,7 +11,7 @@ import About from './components/About';
 
 const App = () => {
   return (
-    <div className='container-fluid'>
+    <div className='container-fluid App'>
       <div className='header'>
         <h1>Pomodoro</h1>
       </div>

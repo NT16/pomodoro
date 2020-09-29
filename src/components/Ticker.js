@@ -1,36 +1,62 @@
 import React, { useState, useEffect } from 'react';
-import Button from 'react-bootstrap/Button'
-import Timer from './Timer';
 import { useLocation } from 'react-router-dom'
+import Timer from './Timer';
+import ConditionalButton from './ConditionalButton';
+import DisplaySet from './DisplaySet';
+import DisplayModal from './DisplayModal';
+import FavouritesDropdownButton from './FavouritesDropdownButton';
+
+const WORK_INITIAL_VALUE = 25;
+const SHORT_BREAK_INITIAL_VALUE = 5;
+const BREAK2_INITIAL_VALUE = 15;
 
 const Ticker = () => {
     const [cycle, setCycle] = useState([2, 1, 2]) //[25,5,25,5,25,5,25,20] //[2,1,2,1,2,1,2,2]
     const [done, setDone] = useState(false)
     const [startClicked, setClicked] = useState(false)
     const [logs, setLog] = useState([])
-    const [work, setWork] = useState(25); //25
-    const [shortBreak, setShortBreak] = useState(5); //5
-    const [break2, setBreak2] = useState(15); //15
+    const [work, setWork] = useState(WORK_INITIAL_VALUE); //25
+    const [shortBreak, setShortBreak] = useState(SHORT_BREAK_INITIAL_VALUE); //5
+    const [break2, setBreak2] = useState(BREAK2_INITIAL_VALUE); //15
     const [index, setIndex] = useState(0)
-
+    const [reset, setReset] = useState(false);
+    const [isSave, setIsSave] = useState(false)
+    const [favourite, setFavourite] = useState(JSON.parse(window.localStorage.getItem('fav')) || [ [WORK_INITIAL_VALUE, SHORT_BREAK_INITIAL_VALUE, BREAK2_INITIAL_VALUE] ] );
+    const [showModal, setModal] = useState(false);
+    const [deleteFavIndex, setDeleteIndex] = useState(null);
+    
     let location = useLocation();
-   
-    function checkInputValidity( value, func ) {
-        if( !isNaN(value) ){
+
+    function checkInputValidity(value, func) {
+        if (!Number.isNaN(value)) {
             func(parseInt(value))
-        } 
+        }
     }
 
+    //using the local storage in React's function components is a side-effect which is best implemented with the Effect Hook which runs every time the value property changes
+    useEffect( ()=> {
+        window.localStorage.setItem('fav', JSON.stringify(favourite) );
+        console.log('Backing up Fav in storage');
+    }, [favourite]);
+
     useEffect(() => {
-        if(location.data){
+        if (location.data) {
             console.log('inside ticker, location.data', location.data)
 
             checkInputValidity(location.data.work, setWork)
             checkInputValidity(location.data.shortBreak, setShortBreak)
-            checkInputValidity(location.data.break2, setBreak2)   
+            checkInputValidity(location.data.break2, setBreak2)
+            if (location.data.save) {
+                setIsSave(true);
+            }
         }
-    }
-    , [location.data])
+    }, [location.data]);
+
+    useEffect(() => {
+        if(isSave){
+            setFavourite(favourite => [...favourite, [work, shortBreak, break2]] );
+        }
+    }, [isSave]);
 
     //1
     const setTimeline = () => {
@@ -47,14 +73,14 @@ const Ticker = () => {
         console.log('cycle inside setTimeline ', cycle.toString())
     }
 
-    useEffect(setTimeline, [work, shortBreak, break2])
+    useEffect( setTimeline, [work, shortBreak, break2]);
 
     //6
     const startTimer = (limit) => {
         console.log('Timer starts')
         console.log('inside startTimer, set is', cycle.toString(), 'set length', cycle.length)
         setDone(false)
-        console.log('limit',limit, 'index', index)
+        console.log('limit', limit, 'index', index)
         setTimeout(() => {
             console.log(`${index + 1}. ${limit} min timer done`)
             setLog([...logs, `${index + 1}. ${limit} min timer done`])
@@ -71,52 +97,82 @@ const Ticker = () => {
             console.log('in useEffect 1, start clicked')
             startTimer(cycle[index])
         }
-    }, [index, cycle, startClicked])
+    }, [index, cycle, startClicked]);
 
     //3. after 'start' button click
     const onStartClick = () => {
         console.log('STart clicked')
         setClicked(true)
-    }
+        setReset(false)
+    };
+
+    const onResetClick = () => {
+        setReset(true)
+        setDone(false)
+        setClicked(false)
+        setLog([])
+        setIndex(0)
+    };
+
+    const onFavClick = (item) => {
+        setWork(item[0]);
+        setShortBreak(item[1]);
+        setBreak2(item[2]);
+        onResetClick();
+    };
+
+    const onClose = (index) => {
+        console.log('deleting fav', index)
+        setDeleteIndex(index);
+        setModal(true);
+    };
+
+    function removeItem() {
+        setFavourite([...favourite.slice(0, deleteFavIndex), ...favourite.slice(deleteFavIndex + 1)]);
+        setDeleteIndex(null);
+    };
 
     const display = () => {
         if (done) {
-            return <div className='display-4'>Done!!!!</div>
+            return <div className='display-4 center-content'>Done!!!</div>
         } else if (startClicked) {
-            return <Timer limit={cycle[index]} />
+            return <Timer limit={cycle[index]} index={index} />
         }
-    }
+    };
 
     return (
-        <div className='row' id='ticker'>
-            <div className='col-md-8'>
-                <div className='text-center'>
+        <>
+            {showModal && <DisplayModal setShow={setModal} onYes={removeItem} />}
+            <div className='text-center'>
+                <div className='row center-jc buttons-row'>
+                    <ConditionalButton condition={!startClicked} name='Start' onClick={onStartClick} />
+                   
+                    <ConditionalButton condition={done && !reset} name='Reset' onClick={onResetClick} />
                     {
-                        !startClicked ?
-                        <Button
-                        onClick={onStartClick}
-                        variant="primary"
-                        >
-                        Start
-                        </Button>
-                        : null
+                        favourite.length !== 0 &&
+                    <FavouritesDropdownButton favourite={favourite} onFavClick={onFavClick} onClose={onClose} />
                     }
-                    
+                </div>
+                <DisplaySet work={work} shortBreak={shortBreak} break2={break2} />
+                {
+                    startClicked && <>
                     <div className='ticker'>
                         {
                             display()
                         }
                     </div>
-                </div>
-            </div>
-            <div className='col-md-4 text-center'>
-                <h4>Logs</h4>
-                {
-                    logs.map((l) => <p key={l}>{l}</p>)
+                    <div className='text-center'>
+                        <h4>Logs</h4>
+                        {
+                            logs.map((l) => <p key={l}>{l}</p>)
+                        }
+                    </div>
+                    </>
                 }
             </div>
-        </div>
+        </>
     )
 }
 
 export default Ticker;
+// <ConditionalButton condition={startClicked} name='Cancel Timer' onClick={onResetClick} />

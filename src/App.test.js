@@ -1,6 +1,10 @@
 import React from 'react';
 import { mount } from 'enzyme';
-import {MemoryRouter} from 'react-router-dom'
+import { MemoryRouter, Router } from 'react-router-dom'
+import { createMemoryHistory } from 'history';
+import { render, fireEvent } from '@testing-library/react';
+import '@testing-library/jest-dom/extend-expect';
+
 import App from './App';
 import Settings from './components/Settings'
 import About from './components/About'
@@ -16,7 +20,7 @@ test('default Home', () => {
   expect(wrapper.find(Ticker)).toHaveLength(1)
   expect(wrapper.find(About)).toHaveLength(0)
   expect(wrapper.find(Settings)).toHaveLength(0)
-  
+
 })
 
 test('navigate to Settings', () => {
@@ -38,7 +42,36 @@ test('navigate to About', () => {
 
   expect(wrapper.find(About)).toHaveLength(1)
   expect(wrapper.find(Settings)).toHaveLength(0)
-  
+
+})
+
+function renderWithRouter(
+  ui,
+  {
+    route = '/',
+    history = createMemoryHistory({ initialEntries: [route] })
+  } = {}
+) {
+  const Wrapper = ({ children }) => (
+    <Router history={history}>{children}</Router>
+  )
+
+  return {
+    ...render(ui, { wrapper: Wrapper }),
+    history
+  }
+}
+
+describe('test full app rendering', () => {
+  test('navigating to Settings Tab', () => {
+    const { container } = renderWithRouter( <App />, { route: 'settings'});
+
+    //expect( container.innerHTML).toMatch('')
+
+    //fireEvent.click(getByText(/settings/i));
+    expect(container.innerHTML).toMatch('Set your own timers');
+
+  })
 })
 
 
@@ -57,11 +90,5 @@ describe( '<App />', () => {
     expect(component.container).toHaveTextContent('About')
     expect(component.container).not.toHaveTextContent('Customise')
   })
-
-  test('renders by default Home', () => {
-    const component = render( <App />)
-    expect(screen.getByText('Start')).toBeDefined()
-    expect(screen.getByText('Logs')).toBeDefined()
-  })  
 })
 */
