@@ -30,7 +30,7 @@ const Settings = () => {
         <div className='container'>
             <h3>Set your own timers</h3>
             <p>mention all time duration in minutes...</p>
-            <form onSubmit={onFormSubmit} className='form-container' data-testid='form'>
+            <form onSubmit={onFormSubmit} className='form-container center-content' data-testid='form'>
                 <FormField id='work' label='Work' attributes={work} />
                 <FormField id='shortBreak' label='Short Break' attributes={shortBreak} />
                 <FormField id='break2' label='Break' attributes={break2} />

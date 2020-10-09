@@ -6,12 +6,12 @@ const Timer = ({ limit, index }) => {
     //4.
     useEffect(() => {
         console.log(`Timer: time ${time}, limit: ${limit}`)
-        setTimeout(() => {
+         setTimeout(() => {
             if (time !== (limit - 1)) {
                 setTime(time + 1)
             }
         }, 60000)
-    }, [time])
+    }, [time, limit])
 
     return (
         <div className='center-content' data-testid='timer'>

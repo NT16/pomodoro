@@ -41,7 +41,7 @@ const Ticker = () => {
 
     useEffect(() => {
         if (location.data) {
-            console.log('inside ticker, location.data', location.data)
+            console.log('Ticker: location.data', location.data)
 
             checkInputValidity(location.data.work, setWork)
             checkInputValidity(location.data.shortBreak, setShortBreak)
@@ -68,40 +68,38 @@ const Ticker = () => {
         }
         let lastIndex = arr.length - 1;
         arr[lastIndex] = arr[lastIndex] + break2;
-        console.log('arr is ', arr.toString())
+        console.log('Cycle will be', arr.toString())
         setCycle(arr)
-        console.log('cycle inside setTimeline ', cycle.toString())
     }
 
     useEffect( setTimeline, [work, shortBreak, break2]);
 
-    //6
-    const startTimer = (limit) => {
-        console.log('Timer starts')
-        console.log('inside startTimer, set is', cycle.toString(), 'set length', cycle.length)
-        setDone(false)
-        console.log('limit', limit, 'index', index)
-        setTimeout(() => {
-            console.log(`${index + 1}. ${limit} min timer done`)
-            setLog([...logs, `${index + 1}. ${limit} min timer done`])
-            setDone('true')
-            if (index !== (cycle.length - 1)) {
-                setIndex(index + 1)
-            }
-        }, limit * 60000)
-    }
-
     //5
     useEffect(() => {
+
+        const startTimer = (limit) => {
+
+            console.log('Ticker:', cycle.toString())
+            setDone(false)
+            console.log('limit', limit, 'index', index)
+            setTimeout(() => {
+                console.log(`${index + 1}. ${limit} min timer done`)
+                setLog( logs => [...logs, `${index + 1}. ${limit} min timer done`]);
+                setDone('true')
+                if (index !== (cycle.length - 1)) {
+                    setIndex(index + 1)
+                }
+            }, limit * 60000)
+        };
+
         if (startClicked) {
-            console.log('in useEffect 1, start clicked')
+            console.log('Ticker: start clicked')
             startTimer(cycle[index])
         }
     }, [index, cycle, startClicked]);
 
     //3. after 'start' button click
     const onStartClick = () => {
-        console.log('STart clicked')
         setClicked(true)
         setReset(false)
     };
@@ -146,10 +144,10 @@ const Ticker = () => {
             <div className='text-center'>
                 <div className='row center-jc buttons-row'>
                     <ConditionalButton condition={!startClicked} name='Start' onClick={onStartClick} />
-                   
+                    <ConditionalButton condition={startClicked} name='Cancel' onClick={onResetClick} />
                     <ConditionalButton condition={done && !reset} name='Reset' onClick={onResetClick} />
                     {
-                        favourite.length !== 0 &&
+                        (!startClicked && favourite.length !== 0) &&
                     <FavouritesDropdownButton favourite={favourite} onFavClick={onFavClick} onClose={onClose} />
                     }
                 </div>
@@ -175,4 +173,3 @@ const Ticker = () => {
 }
 
 export default Ticker;
-// <ConditionalButton condition={startClicked} name='Cancel Timer' onClick={onResetClick} />

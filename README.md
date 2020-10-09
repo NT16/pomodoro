@@ -1,8 +1,8 @@
 Pomodoro App :
 
 Coming up...
-1. Rerun without page refresh
-2. Alerts on timer done
+1. Alerts on timer done
+
 
 
 
