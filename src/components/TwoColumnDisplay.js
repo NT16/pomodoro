@@ -1,8 +1,11 @@
 import React from 'react'
 
-const TwoColumnDisplay = ({ label, data }) => <div>
-    <span className='data-label'>{label} :</span>
-    {data}
-</div>;
+const TwoColumnDisplay = ({ label, data }) => <div className='col-sm-12'>
+        <span className='data-label'>
+            <b>{label}</b> :
+        </span>
+        {data}
+    </div>
+;
 
 export default TwoColumnDisplay;

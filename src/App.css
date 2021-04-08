@@ -39,7 +39,7 @@
 }
 
 .header {
-  margin: 10px auto 30px auto;
+  margin: 30px auto 30px auto;
 }
 
 .navbar-margin {
@@ -50,10 +50,21 @@
 }
 
 .ticker {
-  margin: 20px auto 20px auto;
   background: moccasin;
-  display: flex;
   height: 300px;
+}
+
+.minutes-done {
+  height: 60%;
+  padding-top: 3%;
+}
+
+.total-minutes {
+  height: 20% ;
+}
+
+.info {
+  height: 20%;
 }
 
 .full-width {

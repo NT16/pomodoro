@@ -1,175 +1,167 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useReducer } from 'react';
 import { useLocation } from 'react-router-dom'
 import Timer from './Timer';
 import ConditionalButton from './ConditionalButton';
 import DisplaySet from './DisplaySet';
 import DisplayModal from './DisplayModal';
-import FavouritesDropdownButton from './FavouritesDropdownButton';
+import FavoritesDropdownButton from './FavoritesDropdownButton';
+import tickerReducer from '../reducers/ticker';
+import initialState from '../initialState';
 
-const WORK_INITIAL_VALUE = 25;
-const SHORT_BREAK_INITIAL_VALUE = 5;
-const BREAK2_INITIAL_VALUE = 15;
+
+const getCycle = (work, shortBreak, break2) => {
+    const arr = [];
+    for (let i = 0; i < 4; i++) {
+        arr.push(work)
+        arr.push(shortBreak)
+    }
+    let lastIndex = arr.length - 1;
+    arr[lastIndex] = arr[lastIndex] + break2;
+
+    return arr;
+}
 
 const Ticker = () => {
-    const [cycle, setCycle] = useState([2, 1, 2]) //[25,5,25,5,25,5,25,20] //[2,1,2,1,2,1,2,2]
-    const [done, setDone] = useState(false)
-    const [startClicked, setClicked] = useState(false)
-    const [logs, setLog] = useState([])
-    const [work, setWork] = useState(WORK_INITIAL_VALUE); //25
-    const [shortBreak, setShortBreak] = useState(SHORT_BREAK_INITIAL_VALUE); //5
-    const [break2, setBreak2] = useState(BREAK2_INITIAL_VALUE); //15
-    const [index, setIndex] = useState(0)
-    const [reset, setReset] = useState(false);
-    const [isSave, setIsSave] = useState(false)
-    const [favourite, setFavourite] = useState(JSON.parse(window.localStorage.getItem('fav')) || [ [WORK_INITIAL_VALUE, SHORT_BREAK_INITIAL_VALUE, BREAK2_INITIAL_VALUE] ] );
-    const [showModal, setModal] = useState(false);
-    const [deleteFavIndex, setDeleteIndex] = useState(null);
-    
+
+    const [ticker, dispatchTicker] = useReducer(tickerReducer, initialState);
+    const [showModal, setShowModal] = useState(false);
+    const [deleteIndex, setDeleteIndex] = useState(null);
+
     let location = useLocation();
 
-    function checkInputValidity(value, func) {
+    function checkInputValidity(value, actionType) {
         if (!Number.isNaN(value)) {
-            func(parseInt(value))
+            dispatchTicker({
+                type: actionType,
+                data: parseInt(value)
+            })
         }
     }
 
-    //using the local storage in React's function components is a side-effect which is best implemented with the Effect Hook which runs every time the value property changes
-    useEffect( ()=> {
-        window.localStorage.setItem('fav', JSON.stringify(favourite) );
-        console.log('Backing up Fav in storage');
-    }, [favourite]);
-
     useEffect(() => {
         if (location.data) {
-            console.log('Ticker: location.data', location.data)
-
-            checkInputValidity(location.data.work, setWork)
-            checkInputValidity(location.data.shortBreak, setShortBreak)
-            checkInputValidity(location.data.break2, setBreak2)
+            // changed values in Settings tab
+    
+            checkInputValidity(location.data.work, 'SET_WORK')
+            checkInputValidity(location.data.shortBreak, 'SET_SHORT_BREAK')
+            checkInputValidity(location.data.break2, 'SET_BREAK')
             if (location.data.save) {
-                setIsSave(true);
+                dispatchTicker({
+                    type: 'SAVE_TO_FAVORITES'
+                });
             }
         }
     }, [location.data]);
 
     useEffect(() => {
-        if(isSave){
-            setFavourite(favourite => [...favourite, [work, shortBreak, break2]] );
-        }
-    }, [isSave]);
+        window.localStorage.setItem('fav', JSON.stringify(ticker.favorites));
+    }, [ticker.favorites])
 
-    //1
-    const setTimeline = () => {
-        console.log(`work ${work}, shortBreak ${shortBreak}, break ${break2}`)
-        const arr = []
-        for (let i = 0; i < 4; i++) {
-            arr.push(work)
-            arr.push(shortBreak)
-        }
-        let lastIndex = arr.length - 1;
-        arr[lastIndex] = arr[lastIndex] + break2;
-        console.log('Cycle will be', arr.toString())
-        setCycle(arr)
+    useEffect(() => {
+        let calculatedCycle = getCycle(ticker.work, ticker.shortBreak, ticker.break2);
+
+        dispatchTicker({
+            type: 'SET_CYCLE',
+            data: calculatedCycle
+        });
+    }, [ticker.work, ticker.shortBreak, ticker.break2]);
+
+
+    const onStartClick = () => {
+        dispatchTicker({
+            type: 'START'
+        });
     }
 
-    useEffect( setTimeline, [work, shortBreak, break2]);
-
-    //5
-    useEffect(() => {
-
-        const startTimer = (limit) => {
-
-            console.log('Ticker:', cycle.toString())
-            setDone(false)
-            console.log('limit', limit, 'index', index)
-            setTimeout(() => {
-                console.log(`${index + 1}. ${limit} min timer done`)
-                setLog( logs => [...logs, `${index + 1}. ${limit} min timer done`]);
-                setDone('true')
-                if (index !== (cycle.length - 1)) {
-                    setIndex(index + 1)
-                }
-            }, limit * 60000)
-        };
-
-        if (startClicked) {
-            console.log('Ticker: start clicked')
-            startTimer(cycle[index])
-        }
-    }, [index, cycle, startClicked]);
-
-    //3. after 'start' button click
-    const onStartClick = () => {
-        setClicked(true)
-        setReset(false)
-    };
-
     const onResetClick = () => {
-        setReset(true)
-        setDone(false)
-        setClicked(false)
-        setLog([])
-        setIndex(0)
-    };
+        dispatchTicker({
+            type: 'RESET'
+        })
+    }
 
     const onFavClick = (item) => {
-        setWork(item[0]);
-        setShortBreak(item[1]);
-        setBreak2(item[2]);
-        onResetClick();
-    };
+        dispatchTicker({
+            type: 'CHANGE_TO_SELECTED_FAVORITE',
+            data: item
+        });
 
-    const onClose = (index) => {
-        console.log('deleting fav', index)
-        setDeleteIndex(index);
-        setModal(true);
-    };
+        dispatchTicker({
+            type: 'RESET'
+        });
+    }
 
-    function removeItem() {
-        setFavourite([...favourite.slice(0, deleteFavIndex), ...favourite.slice(deleteFavIndex + 1)]);
+    let deleteFav = () => {
+        dispatchTicker({
+            type: 'DELETE_FROM_FAVORITES',
+            data: deleteIndex
+        })
+        setShowModal(false);
         setDeleteIndex(null);
-    };
+    }
 
-    const display = () => {
-        if (done) {
-            return <div className='display-4 center-content'>Done!!!</div>
-        } else if (startClicked) {
-            return <Timer limit={cycle[index]} index={index} />
+    const confirmModal = (index) => {
+        setShowModal(true);
+        setDeleteIndex(index);
+    }
+
+
+    const onTimerDone = () => {
+        console.log('Pomodoro done');
+
+        dispatchTicker({ type: 'TIMER_END' });
+    }
+
+    return <div>
+        { showModal &&
+            <DisplayModal
+                setShow={setShowModal}
+                onYes={deleteFav}
+            />
         }
-    };
 
-    return (
-        <>
-            {showModal && <DisplayModal setShow={setModal} onYes={removeItem} />}
-            <div className='text-center'>
-                <div className='row center-jc buttons-row'>
-                    <ConditionalButton condition={!startClicked} name='Start' onClick={onStartClick} />
-                    <ConditionalButton condition={startClicked} name='Cancel' onClick={onResetClick} />
-                    <ConditionalButton condition={done && !reset} name='Reset' onClick={onResetClick} />
-                    {
-                        (!startClicked && favourite.length !== 0) &&
-                    <FavouritesDropdownButton favourite={favourite} onFavClick={onFavClick} onClose={onClose} />
-                    }
-                </div>
-                <DisplaySet work={work} shortBreak={shortBreak} break2={break2} />
+        <div className='text-center'>
+            <DisplaySet
+                work={ticker.work}
+                shortBreak={ticker.shortBreak}
+                break2={ticker.break2} />
+                
+            <div className='row center-jc buttons-row'>
+                <ConditionalButton
+                    condition={!ticker.startClicked}
+                    name='Start'
+                    onClick={onStartClick} />
+
+                <ConditionalButton
+                    condition={ticker.startClicked && !ticker.done}
+                    name='Cancel'
+                    onClick={onResetClick} />
+
+                <ConditionalButton
+                    condition={ticker.done}
+                    name='Reset'
+                    onClick={onResetClick} />
+
                 {
-                    startClicked && <>
-                    <div className='ticker'>
-                        {
-                            display()
-                        }
-                    </div>
-                    <div className='text-center'>
-                        <h4>Logs</h4>
-                        {
-                            logs.map((l) => <p key={l}>{l}</p>)
-                        }
-                    </div>
-                    </>
+                    (!ticker.startClicked && ticker.favorites.length !== 0) &&
+                    <FavoritesDropdownButton
+                        favorites={ticker.favorites}
+                        onFavClick={onFavClick}
+                        onClose={confirmModal} />
                 }
             </div>
-        </>
-    )
+
+            {
+                ticker.done ?
+                    <div>Done</div> : (
+                        ticker.startClicked ?
+                            <Timer
+                                cycle={ticker.cycle}
+                                onTimerDone={onTimerDone} /> :
+                            null
+                    )
+            }
+        </div>
+    </div>;
 }
 
 export default Ticker;
