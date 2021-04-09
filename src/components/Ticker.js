@@ -104,7 +104,6 @@ const Ticker = () => {
         setDeleteIndex(index);
     }
 
-
     const onTimerDone = () => {
         console.log('Pomodoro done');
 

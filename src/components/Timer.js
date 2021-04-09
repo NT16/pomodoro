@@ -4,7 +4,6 @@ const Timer = ({ cycle, onTimerDone }) => {
     const [time, setTime] = useState(0);
     const [index, setIndex] = useState(0);
 
-
     useEffect(() => {
         let one_minute_timeout;
 

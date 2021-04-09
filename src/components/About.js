@@ -11,7 +11,7 @@ const About = () => {
                 <p>Or customise your work/ short break/ long break duration in "Settings" tab</p>
             </div>
             
-            <p><strong>App Built using:</strong> ReactJS (React Hooks), React Router</p>
+            <p><b>App Built using:</b> ReactJS (React Hooks), React Router</p>
         </div>
     )
 }
