@@ -39,18 +39,20 @@
 }
 
 .header {
-  margin: 30px auto 30px auto;
+  margin: 10px auto 10px auto;
+  justify-content: space-between;
 }
 
 .navbar-margin {
   margin-bottom: 25px;
+  justify-content: end;
 }
 .form-container {
-  width: 25%;
+  width: 50%;
 }
-
 .ticker {
   background: moccasin;
+  border-radius: 10px;
   height: 300px;
 }
 
@@ -60,7 +62,7 @@
 }
 
 .total-minutes {
-  height: 20% ;
+  height: 20%;
 }
 
 .info {
@@ -71,10 +73,10 @@
   width: 100%;
 }
 
-@media only screen and (max-width: 600px) { 
+@media only screen and (max-width: 600px) {
   .form-container {
     width: 100%;
-  }  
+  }
 }
 
 .data-label {
@@ -82,7 +84,7 @@
 }
 
 .center-content {
-  margin : auto;
+  margin: auto;
 }
 
 .timer-line-1 {
@@ -95,6 +97,7 @@
   font-size: 1.5rem;
   font-weight: 100;
   line-height: 0.2;
+  margin-top: -8%;
 }
 
 .fav-row {
@@ -116,4 +119,18 @@
 .fav-close {
   margin-left: auto;
   margin-right: -5%;
+}
+
+.controls {
+  width: max-content;
+}
+
+.display-set {
+  border: 2px solid black;
+  border-radius: 10px;
+  padding: 2%;
+}
+
+.content {
+  margin-top: 3%;
 }

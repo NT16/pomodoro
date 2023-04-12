@@ -1,17 +1,14 @@
-import React from 'react'
-import Button from 'react-bootstrap/Button'
+import React from "react";
+import Button from "react-bootstrap/Button";
 
-const ConditionalButton = ({condition, name, onClick }) => {
-    const button = condition ?
-    <Button
-    onClick={onClick}
-    variant="primary"
-    >
-    {name}
+const ConditionalButton = ({ condition, name, onClick }) => {
+  const button = condition ? (
+    <Button onClick={onClick} variant="primary btn-sm">
+      {name}
     </Button>
-    : null
+  ) : null;
 
-    return button;
+  return button;
 };
 
 export default ConditionalButton;
