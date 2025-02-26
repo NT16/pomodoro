@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useReducer } from "react";
+import React, { useState, useEffect, useReducer, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import Timer from "./Timer";
-import ConditionalButton from "./ConditionalButton";
-import DisplaySet from "./DisplaySet";
-import DisplayModal from "./DisplayModal";
-import FavoritesDropdownButton from "./FavoritesDropdownButton";
+import ConditionalButton from "./presentation/ConditionalButton";
+import DisplaySet from "./presentation/DisplaySet";
+import DisplayModal from "./presentation/DisplayModal";
+import FavoritesDropdownButton from "./presentation/FavoritesDropdownButton";
 import tickerReducer from "../reducers/ticker";
 import initialState from "../initialState";
 
@@ -26,6 +26,11 @@ const Ticker = () => {
   const [deleteIndex, setDeleteIndex] = useState(null);
 
   let location = useLocation();
+  let calculatedCycle = useMemo(
+    () => getCycle(ticker.work, ticker.shortBreak, ticker.break2),
+    [ticker.work, ticker.shortBreak, ticker.break2]
+  );
+  console.log("computed cycle :", calculatedCycle);
 
   function checkInputValidity(value, actionType) {
     if (!Number.isNaN(value)) {
@@ -54,19 +59,6 @@ const Ticker = () => {
   useEffect(() => {
     window.localStorage.setItem("fav", JSON.stringify(ticker.favorites));
   }, [ticker.favorites]);
-
-  useEffect(() => {
-    let calculatedCycle = getCycle(
-      ticker.work,
-      ticker.shortBreak,
-      ticker.break2
-    );
-
-    dispatchTicker({
-      type: "SET_CYCLE",
-      data: calculatedCycle,
-    });
-  }, [ticker.work, ticker.shortBreak, ticker.break2]);
 
   const onStartClick = () => {
     dispatchTicker({
@@ -115,8 +107,8 @@ const Ticker = () => {
     <div className="content">
       {showModal && <DisplayModal setShow={setShowModal} onYes={deleteFav} />}
 
-      <div className="text-center row">
-        <div className="controls col-md-6 col-xs-12">
+      <div className="text-center">
+        <div className="controls">
           <DisplaySet
             work={ticker.work}
             shortBreak={ticker.shortBreak}
@@ -151,11 +143,11 @@ const Ticker = () => {
             )}
           </div>
         </div>
-        <div className="col-md-6 col-xs-12">
+        <div className="">
           {ticker.done ? (
             <div>Done</div>
           ) : ticker.startClicked ? (
-            <Timer cycle={ticker.cycle} onTimerDone={onTimerDone} />
+            <Timer cycle={calculatedCycle} onTimerDone={onTimerDone} />
           ) : null}
         </div>
       </div>

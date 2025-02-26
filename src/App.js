@@ -10,13 +10,13 @@ import "bootstrap/dist/css/bootstrap.css";
 // components takes precedence over default styles.
 import "./App.css";
 import Ticker from "./components/Ticker";
-import NavbarWithRouter from "./components/Navbar";
+import NavbarWithRouter from "./components/presentation/Navbar";
 import Settings from "./components/Settings";
 import About from "./components/About";
 
 const App = () => {
   return (
-    <div className="container-fluid App">
+    <div className="App">
       <Router className="container">
         <NavbarWithRouter />
         <Switch>

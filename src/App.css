@@ -1,6 +1,13 @@
+#root {
+  width: 100%;
+  height: 92vh;
+}
 .App {
   text-align: center;
-  width: 75%;
+  height: 100%;
+  display: flex;
+  margin: 2%;
+  flex-direction: column;
 }
 
 .App-logo {
@@ -38,35 +45,32 @@
   }
 }
 
-.header {
-  margin: 10px auto 10px auto;
-  justify-content: space-between;
+h1 {
+  font-size: large;
+  text-align: justify;
 }
 
 .navbar-margin {
-  margin-bottom: 25px;
   justify-content: end;
 }
 .form-container {
   width: 50%;
 }
 .ticker {
-  background: moccasin;
-  border-radius: 10px;
-  height: 300px;
+  display: flex;
+  flex-direction: column;
 }
 
 .minutes-done {
-  height: 60%;
-  padding-top: 3%;
 }
 
 .total-minutes {
-  height: 20%;
 }
 
 .info {
-  height: 20%;
+  display: flex;
+  margin: 0 auto;
+  line-height: 120px;
 }
 
 .full-width {
@@ -97,7 +101,6 @@
   font-size: 1.5rem;
   font-weight: 100;
   line-height: 0.2;
-  margin-top: -8%;
 }
 
 .fav-row {
@@ -129,8 +132,13 @@
   border: 2px solid black;
   border-radius: 10px;
   padding: 2%;
+  background: white;
 }
 
 .content {
   margin-top: 3%;
+  background: moccasin;
+  border-radius: 12px;
+  /* flex-grow: 2; */
+  height: 100%;
 }
